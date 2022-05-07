@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/home_p"
+            android:title="@string/home_item"/>
+
+        <item
+            android:id="@+id/fav_p"
+            android:title="@string/favourite_item" />
+
+        <item
+            android:id="@+id/alert_p"
+            android:title="@string/alert_item"/>
+
+        <item
+            android:id="@+id/setting_p"
+            android:title="@string/settings_item"/>
+
+    </group>
+
+</menu>
