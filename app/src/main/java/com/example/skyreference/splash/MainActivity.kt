@@ -1,7 +1,8 @@
-package com.example.skyreference
+package com.example.skyreference.splash
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.skyreference.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
