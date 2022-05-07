@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Sky Reference</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home_item">Home</string>
+    <string name="favourite_item">Favourite</string>
+    <string name="alert_item">Alert</string>
+    <string name="settings_item">Settings</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
 </resources>
