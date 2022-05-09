@@ -26,6 +26,7 @@ import com.example.skyreference.SearchActivity
 import com.example.skyreference.alerts.AlertFragment
 import com.example.skyreference.favourites.FavFragment
 import com.example.skyreference.settings.SettingsFragment
+import com.example.skyreference.splash.MainActivity
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -33,12 +34,11 @@ import com.google.android.material.navigation.NavigationView
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private val REQ_LOCATION_CODE: Int = 7
+    private val GPS_REQ_CODE = 100
     companion object {
-        private const val REQLOCATIONCODE: Int = 7
-        const val USERLOCATION_LONG = "userlocationlong"
-        const val USERLOCATION_LAT = "userlocationlat"
-        const val SHARED_DATA = "sharedData"
-        const val GPSREQCODE = 100
+        const val USER_LOCATION_LONG = "userLocationLong"
+        const val USER_LOCATION_LAT = "userLocationLat"
     }
     lateinit var drawerLayout: DrawerLayout
     lateinit var locationRequest: LocationRequest
@@ -136,7 +136,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         {
             ActivityCompat.requestPermissions(this, arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,),REQLOCATIONCODE)
+                Manifest.permission.ACCESS_COARSE_LOCATION,),REQ_LOCATION_CODE)
         }
         checkGPS()
     }
@@ -186,7 +186,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     @SuppressLint("MissingPermission")
-    private fun printLocation()
+    private fun getLocation()
     {
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
         val locationListener = object : LocationListener {
@@ -196,11 +196,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Log.i("call", "Latitude: $latitude ; longitude: $longitude")
                 Toast.makeText(applicationContext,"Latitude: $latitude ; longitude: $longitude",Toast.LENGTH_SHORT).show()
                 //save user location
-                val sharedPreferences = getSharedPreferences(SHARED_DATA, Context.MODE_PRIVATE)
+                val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA, Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                     editor.apply {
-                        putString(USERLOCATION_LAT,latitude.toString())
-                        putString(USERLOCATION_LONG,longitude.toString())
+                        putString(USER_LOCATION_LAT,latitude.toString())
+                        putString(USER_LOCATION_LONG,longitude.toString())
                     }.apply()
 
             }
@@ -230,7 +230,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode){
-            REQLOCATIONCODE->{
+            REQ_LOCATION_CODE->{
                     if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     {
                         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -247,11 +247,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == GPSREQCODE)
+        if(requestCode == GPS_REQ_CODE)
         {
             when(resultCode){
                 Activity.RESULT_OK->{
-                    printLocation()
+                    getLocation()
                 }
                 Activity.RESULT_CANCELED->
                 {
@@ -260,19 +260,21 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         startActivity(Intent(this,SearchActivity::class.java))
                         finish()
                     }
-                    val sharedPreferences = getSharedPreferences(SHARED_DATA,Context.MODE_PRIVATE)
-                    val lat = sharedPreferences.getString(USERLOCATION_LAT,null)
-                    val long = sharedPreferences.getString(USERLOCATION_LONG,null)
-                    Log.i("call", "Latitude: $lat ; longitude: $long")
+                    val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA,Context.MODE_PRIVATE)
+                    val lat = sharedPreferences.getString(USER_LOCATION_LAT,null)
+                    val long = sharedPreferences.getString(USER_LOCATION_LONG,null)
+                    val lang = sharedPreferences.getString(MainActivity.LANG,null)
+                    val unit = sharedPreferences.getString(MainActivity.UNIT,null)
+                    Log.i("call", "Latitude: $lat ; longitude: $long; lang: $lang ; unit:$unit")
                     Toast.makeText(applicationContext,"Latitude: $lat ; longitude: $long",Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
     private fun getStoredUserLocation():Boolean{
-        val sharedPreferences = getSharedPreferences(SHARED_DATA,Context.MODE_PRIVATE)
-        val lat = sharedPreferences.getString(USERLOCATION_LAT,null)
-        val long = sharedPreferences.getString(USERLOCATION_LONG,null)
+        val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA,Context.MODE_PRIVATE)
+        val lat = sharedPreferences.getString(USER_LOCATION_LAT,null)
+        val long = sharedPreferences.getString(USER_LOCATION_LONG,null)
         if(lat !=null && long != null)
         {
             return true
