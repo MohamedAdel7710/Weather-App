@@ -20,15 +20,16 @@
             android:name=".home.view.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.SkyReference.NoActionBar">
+        </activity>
+        <activity
+            android:name=".splash.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".splash.MainActivity"
-            android:exported="false"></activity>
     </application>
 
 </manifest>
