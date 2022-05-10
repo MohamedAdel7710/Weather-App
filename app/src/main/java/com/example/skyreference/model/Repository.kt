@@ -1,18 +1,21 @@
 package com.example.skyreference.model
 
 import android.content.Context
+import com.example.skyreference.db.WeatherLocalsource
 import com.example.skyreference.networklayer.RemoteClientInterface
 import retrofit2.Response
 
 class Repository private constructor(
     var remoteClient:RemoteClientInterface,
+    var localClient:WeatherLocalsource,
     var context: Context):RepositoryInterface{
     companion object{
         private var instance : Repository ?= null
         fun getInstance(
             remoteClient:RemoteClientInterface,
+            localClient: WeatherLocalsource,
             context: Context):Repository{
-            return instance?: Repository(remoteClient,context)
+            return instance?: Repository(remoteClient,localClient,context)
         }
     }
 
