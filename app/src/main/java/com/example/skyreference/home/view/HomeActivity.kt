@@ -77,7 +77,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //Fetch User Location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 //        checkGPS()
-        takeLocationPermissionAccess()
+        //takeLocationPermissionAccess()
 
 
     }
@@ -216,12 +216,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
     }
 
-    private fun userResponseToPermissionReq():Boolean{
-        var permission : Boolean = false
-
-
-         return permission
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
