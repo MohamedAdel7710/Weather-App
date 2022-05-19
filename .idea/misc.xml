@@ -3,14 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/drawable/custom_button.xml" value="0.21944444444444444" />
+        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/activity_fav.xml" value="0.26904985888993416" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/activity_home.xml" value="0.176" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/activity_main.xml" value="0.1721014492753623" />
+        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/activity_maps.xml" value="0.264" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/activity_search.xml" value="0.264" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/daily_weather_cell.xml" value="0.2269021739130435" />
+        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fav_location_row.xml" value="0.264" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fragment_alert.xml" value="0.17346014492753623" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fragment_fav.xml" value="0.17346014492753623" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fragment_home.xml" value="0.4" />
-        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fragment_settings.xml" value="0.17346014492753623" />
+        <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/fragment_settings.xml" value="0.264" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/hourly_weather_cell.xml" value="0.53470715835141" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/nav_header.xml" value="0.4" />
         <entry key="..\:/ITI/ITIMaterial/Kotlin/Demos/Weather App/app/src/main/res/layout/top_app_bar.xml" value="0.1721014492753623" />

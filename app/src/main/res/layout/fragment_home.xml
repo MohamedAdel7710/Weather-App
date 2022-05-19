@@ -175,7 +175,7 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="270dp"
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginTop="15dp"
                 app:cardCornerRadius="15dp"
@@ -192,6 +192,7 @@
                         android:id="@+id/pressure_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="TextView"
                         app:layout_constraintEnd_toEndOf="@+id/pressure_icon"
                         app:layout_constraintStart_toStartOf="@+id/pressure_icon"
@@ -199,9 +200,9 @@
 
                     <ImageView
                         android:id="@+id/pressure_icon"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="32dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="60dp"
                         android:layout_marginTop="16dp"
                         android:src="@drawable/pressure2_icon"
                         app:layout_constraintStart_toStartOf="parent"
@@ -212,17 +213,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="TextView"
+                        android:text="@string/pressure_txt"
+                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="@+id/pressure_icon"
                         app:layout_constraintStart_toStartOf="@+id/pressure_icon"
                         app:layout_constraintTop_toBottomOf="@+id/pressure_value" />
 
                     <ImageView
                         android:id="@+id/humidity_icon"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
+                        android:layout_marginEnd="60dp"
                         android:src="@drawable/humidity2_icon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -231,17 +233,18 @@
                         android:id="@+id/humidity_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="TextView"
                         app:layout_constraintEnd_toEndOf="@+id/humidity_icon"
                         app:layout_constraintStart_toStartOf="@+id/humidity_icon"
-                        app:layout_constraintTop_toBottomOf="@+id/humidity_icon"  />
+                        app:layout_constraintTop_toBottomOf="@+id/humidity_icon" />
 
                     <TextView
                         android:id="@+id/humidity_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="TextView"
+                        android:text="@string/humidity_txt"
                         app:layout_constraintEnd_toEndOf="@+id/humidity_icon"
                         app:layout_constraintStart_toStartOf="@+id/humidity_icon"
                         app:layout_constraintTop_toBottomOf="@+id/humidity_value" />
@@ -251,6 +254,7 @@
                         android:id="@+id/wind_speed_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="TextView"
                         app:layout_constraintEnd_toEndOf="@+id/wind_speed_icon"
                         app:layout_constraintStart_toStartOf="@+id/wind_speed_icon"
@@ -258,9 +262,9 @@
 
                     <ImageView
                         android:id="@+id/wind_speed_icon"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="32dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="60dp"
                         android:layout_marginTop="16dp"
                         android:src="@drawable/wind_speed_icon"
                         app:layout_constraintStart_toStartOf="parent"
@@ -271,17 +275,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="TextView"
+                        android:text="@string/wind_speed_txt"
                         app:layout_constraintEnd_toEndOf="@+id/wind_speed_icon"
                         app:layout_constraintStart_toStartOf="@+id/wind_speed_icon"
                         app:layout_constraintTop_toBottomOf="@+id/wind_speed_value" />
 
                     <ImageView
                         android:id="@+id/cloud_icon"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
+                        android:layout_marginEnd="60dp"
                         android:src="@drawable/cloud_icon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/humidity_txt" />
@@ -290,17 +294,18 @@
                         android:id="@+id/cloud_value_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="TextView"
                         app:layout_constraintEnd_toEndOf="@+id/cloud_icon"
                         app:layout_constraintStart_toStartOf="@+id/cloud_icon"
-                        app:layout_constraintTop_toBottomOf="@+id/cloud_icon"  />
+                        app:layout_constraintTop_toBottomOf="@+id/cloud_icon" />
 
                     <TextView
                         android:id="@+id/cloud_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="TextView"
+                        android:text="@string/cloud_txt"
                         app:layout_constraintEnd_toEndOf="@+id/cloud_icon"
                         app:layout_constraintStart_toStartOf="@+id/cloud_icon"
                         app:layout_constraintTop_toBottomOf="@+id/cloud_value_txt" />

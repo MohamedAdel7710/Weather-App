@@ -10,11 +10,11 @@ interface WeatherDAO {
     @get:Query("SELECT * FROM FavouriteLocations")
     val allFavouriteLocation: LiveData<List<WeatherData>>
 
-//    @Query("SELECT * FROM FavouriteLocations WHERE (lat = :lati AND long = :long)")
-//    fun getWeatherOfLocation(lati:Double,long:Double):LiveData<List<WeatherData>>
+    @Query("SELECT * FROM FavouriteLocations WHERE (lat = :lat AND lon = :lon)")
+    fun getWeatherOfLocation(lat:Double,lon:Double):WeatherData
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun inserLocation(location:WeatherData)
+    fun insertLocation(location:WeatherData)
 
     @Delete
     fun deleteLocation(location: WeatherData)

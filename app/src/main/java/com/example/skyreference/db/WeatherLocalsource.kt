@@ -7,4 +7,5 @@ interface WeatherLocalsource {
     fun getAllFavourites():LiveData<List<WeatherData>>
     fun insertFavLocation(location:WeatherData)
     fun deleteThisLocation(location:WeatherData)
+    fun getWeatherofThisLocation(lat:Double,lon:Double):WeatherData
 }

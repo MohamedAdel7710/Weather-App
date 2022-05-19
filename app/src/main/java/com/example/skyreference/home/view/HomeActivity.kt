@@ -21,10 +21,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentTransaction
+import com.example.skyreference.map.view.MapsActivity
 import com.example.skyreference.R
-import com.example.skyreference.SearchActivity
 import com.example.skyreference.alerts.AlertFragment
-import com.example.skyreference.favourites.FavFragment
+import com.example.skyreference.favourites.view.FavActivity
+import com.example.skyreference.favourites.view.FavFragment
+import com.example.skyreference.model.Constant
+import com.example.skyreference.networklayer.NetworkValidation
 import com.example.skyreference.settings.SettingsFragment
 import com.example.skyreference.splash.MainActivity
 import com.google.android.gms.common.api.ApiException
@@ -47,10 +50,20 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val homeFragment = HomeFragment()
-        supportFragmentManager.beginTransaction().replace(R.id.home_fragmentcontainer, homeFragment)
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .commit()
+        val toFav = intent.getBooleanExtra("toFav",false)
+        if(toFav){
+            val favFragment = FavFragment()
+            supportFragmentManager.beginTransaction().replace(R.id.home_fragmentcontainer, favFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit()
+        }
+        else {
+            val homeFragment = HomeFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.home_fragmentcontainer, homeFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit()
+        }
         //Navigation Drawer
         drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView: NavigationView = findViewById(R.id.nav_view)
@@ -74,10 +87,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerToggle.syncState()
 
         navigationView.setNavigationItemSelectedListener(this)
-        //Fetch User Location
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-//        checkGPS()
-        //takeLocationPermissionAccess()
+
 
 
     }
@@ -97,6 +107,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .replace(R.id.home_fragmentcontainer, favFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit()
+//                startActivity(Intent(this,FavActivity::class.java))
             }
             R.id.alert_p -> {
                 val alertFragment = AlertFragment()
@@ -106,11 +117,20 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .commit()
             }
             R.id.setting_p -> {
-                val settingFragment = SettingsFragment()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.home_fragmentcontainer, settingFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit()
+                if (NetworkValidation.isNetworkAvailable(context = applicationContext)){
+                    val settingFragment = SettingsFragment()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.home_fragmentcontainer, settingFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .commit()
+                }
+                else{
+                    Toast.makeText(
+                        applicationContext,
+                        "Please Check your internet Connection",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
@@ -125,156 +145,157 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             super.onBackPressed()
         }
     }
-
-    private fun takeLocationPermissionAccess()
-    {
-
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this, arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,),REQ_LOCATION_CODE)
-        }
-        checkGPS()
-    }
-
-    private fun checkGPS(){
-        locationRequest = LocationRequest.create()
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        locationRequest.interval = 5000
-        locationRequest.fastestInterval = 2000
-
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
-        builder.setAlwaysShow(true)
-        val  result = LocationServices.getSettingsClient(this.applicationContext)
-            .checkLocationSettings(builder.build())
-
-        result.addOnCompleteListener {
-            task ->
-                try {
-                    val response = task.getResult(
-                        ApiException::class.java
-                    )
-                }
-                catch (e : ApiException)
-                {
-                    e.printStackTrace()
-                    when(e.statusCode)
-                    {
-                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->{
-                            try{
-                                // ask for enable GPS
-                                val resolveApiException = e as ResolvableApiException
-                                resolveApiException.startResolutionForResult(this,100)
-                            }
-                            catch (sendIntentException: IntentSender.SendIntentException){
-                            }
-                        }
-                        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE->{
-                            //when
-                        }
-                    }
-                }
-        }
-
-    }
-
-
-
-    @SuppressLint("MissingPermission")
-    private fun getLocation()
-    {
-        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
-        val locationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                val latitude = location.latitude
-                val longitude = location.longitude
-                Log.i("call", "Latitude: $latitude ; longitude: $longitude")
-                Toast.makeText(applicationContext,"Latitude: $latitude ; longitude: $longitude",Toast.LENGTH_SHORT).show()
-                //save user location
-                val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA, Context.MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                    editor.apply {
-                        putString(USER_LOCATION_LAT,latitude.toString())
-                        putString(USER_LOCATION_LONG,longitude.toString())
-                    }.apply()
-
-            }
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-            override fun onProviderEnabled(provider: String) {}
-            override fun onProviderDisabled(provider: String) {}
-        }
-        locationManager!!.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER,
-            0L,
-            0f,
-            locationListener
-        )
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode){
-            REQ_LOCATION_CODE->{
-                    if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    {
-                        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                        {
-                            checkGPS()
-                        }
-                    } else {
-                        startActivity(Intent(this,SearchActivity::class.java))
-                        finish()
-                    }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == GPS_REQ_CODE)
-        {
-            when(resultCode){
-                Activity.RESULT_OK->{
-                    getLocation()
-                }
-                Activity.RESULT_CANCELED->
-                {
-                    if(!getStoredUserLocation())
-                    {
-                        startActivity(Intent(this,SearchActivity::class.java))
-                        finish()
-                    }
-                    val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA,Context.MODE_PRIVATE)
-                    val lat = sharedPreferences.getString(USER_LOCATION_LAT,null)
-                    val long = sharedPreferences.getString(USER_LOCATION_LONG,null)
-                    val lang = sharedPreferences.getString(MainActivity.LANG,null)
-                    val unit = sharedPreferences.getString(MainActivity.UNIT,null)
-                    Log.i("call", "Latitude: $lat ; longitude: $long; lang: $lang ; unit:$unit")
-                    Toast.makeText(applicationContext,"Latitude: $lat ; longitude: $long",Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-    private fun getStoredUserLocation():Boolean{
-        val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA,Context.MODE_PRIVATE)
-        val lat = sharedPreferences.getString(USER_LOCATION_LAT,null)
-        val long = sharedPreferences.getString(USER_LOCATION_LONG,null)
-        if(lat !=null && long != null)
-        {
-            return true
-        }
-        return false
-    }
+//
+//    //unused code
+//    private fun takeLocationPermissionAccess()
+//    {
+//
+//        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+//                Manifest.permission.ACCESS_COARSE_LOCATION)
+//            != PackageManager.PERMISSION_GRANTED)
+//        {
+//            ActivityCompat.requestPermissions(this, arrayOf(
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,),REQ_LOCATION_CODE)
+//        }
+//        checkGPS()
+//    }
+//
+//    private fun checkGPS(){
+//        locationRequest = LocationRequest.create()
+//        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        locationRequest.interval = 5000
+//        locationRequest.fastestInterval = 2000
+//
+//        val builder = LocationSettingsRequest.Builder()
+//            .addLocationRequest(locationRequest)
+//        builder.setAlwaysShow(true)
+//        val  result = LocationServices.getSettingsClient(this.applicationContext)
+//            .checkLocationSettings(builder.build())
+//
+//        result.addOnCompleteListener {
+//            task ->
+//                try {
+//                    val response = task.getResult(
+//                        ApiException::class.java
+//                    )
+//                }
+//                catch (e : ApiException)
+//                {
+//                    e.printStackTrace()
+//                    when(e.statusCode)
+//                    {
+//                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->{
+//                            try{
+//                                // ask for enable GPS
+//                                val resolveApiException = e as ResolvableApiException
+//                                resolveApiException.startResolutionForResult(this,100)
+//                            }
+//                            catch (sendIntentException: IntentSender.SendIntentException){
+//                            }
+//                        }
+//                        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE->{
+//                            //when
+//                        }
+//                    }
+//                }
+//        }
+//
+//    }
+//
+//
+//
+//    @SuppressLint("MissingPermission")
+//    private fun getLocation()
+//    {
+//        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
+//        val locationListener = object : LocationListener {
+//            override fun onLocationChanged(location: Location) {
+//                val latitude = location.latitude
+//                val longitude = location.longitude
+//                Log.i("call", "Latitude: $latitude ; longitude: $longitude")
+//                Toast.makeText(applicationContext,"Latitude: $latitude ; longitude: $longitude",Toast.LENGTH_SHORT).show()
+//                //save user location
+//                val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA, Context.MODE_PRIVATE)
+//                val editor = sharedPreferences.edit()
+//                    editor.apply {
+//                        putString(USER_LOCATION_LAT,latitude.toString())
+//                        putString(USER_LOCATION_LONG,longitude.toString())
+//                    }.apply()
+//
+//            }
+//            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+//            override fun onProviderEnabled(provider: String) {}
+//            override fun onProviderDisabled(provider: String) {}
+//        }
+//        locationManager!!.requestLocationUpdates(
+//            LocationManager.NETWORK_PROVIDER,
+//            0L,
+//            0f,
+//            locationListener
+//        )
+//    }
+//
+//
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        when(requestCode){
+//            REQ_LOCATION_CODE->{
+//                    if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                    {
+//                        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+//                        {
+//                            checkGPS()
+//                        }
+//                    } else {
+//                        startActivity(Intent(this, MapsActivity::class.java))
+//                        finish()
+//                    }
+//            }
+//        }
+//    }
+//
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if(requestCode == GPS_REQ_CODE)
+//        {
+//            when(resultCode){
+//                Activity.RESULT_OK->{
+//                    getLocation()
+//                }
+//                Activity.RESULT_CANCELED->
+//                {
+//                    if(!getStoredUserLocation())
+//                    {
+//                        startActivity(Intent(this, MapsActivity::class.java))
+//                        finish()
+//                    }
+//                    val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA,Context.MODE_PRIVATE)
+//                    val lat = sharedPreferences.getString(Constant.USER_LOCATION_LAT,null)
+//                    val long = sharedPreferences.getString(Constant.USER_LOCATION_LONG,null)
+//                    val lang = sharedPreferences.getString(Constant.LANG,null)
+//                    val unit = sharedPreferences.getString(Constant.UNIT,null)
+//                    Log.i("call", "Latitude: $lat ; longitude: $long; lang: $lang ; unit:$unit")
+//                    Toast.makeText(applicationContext,"Latitude: $lat ; longitude: $long",Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
+//    }
+//    private fun getStoredUserLocation():Boolean{
+//        val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA,Context.MODE_PRIVATE)
+//        val lat = sharedPreferences.getString(Constant.USER_LOCATION_LAT,null)
+//        val long = sharedPreferences.getString(Constant.USER_LOCATION_LONG,null)
+//        if(lat !=null && long != null)
+//        {
+//            return true
+//        }
+//        return false
+//    }
 
 
 }
