@@ -12,7 +12,7 @@ interface WeatherServiceInterface {
     suspend fun getCurrentWeather(@Query("lat") lat:Double,
                                   @Query("lon") lon:Double,
                                   //@Query("exclude") exclude:String,
-                                  @Query("lan")lang:String,
+                                  @Query("lang")lang:String,
                                   @Query("appid")id:String,
                                   @Query("units")unit:String)
                                   : Response<WeatherData>
