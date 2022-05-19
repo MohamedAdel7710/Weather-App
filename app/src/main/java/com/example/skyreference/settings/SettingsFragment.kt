@@ -1,6 +1,7 @@
 package com.example.skyreference.settings
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,8 +12,10 @@ import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import com.example.skyreference.R
+import com.example.skyreference.home.view.HomeActivity
 import com.example.skyreference.model.Constant
 import com.example.skyreference.splash.MainActivity
+import java.util.*
 
 
 class SettingsFragment : Fragment() {
@@ -85,8 +88,6 @@ class SettingsFragment : Fragment() {
             windSpeed_radioGroup.check(windbtnNum)
             tempUnit_radipGroup.check(tempbtnNum)
         }
-
-
         //notifications
         if(!alert) {
             val notify_num = notify_radipGroup.getChildAt(1).id
@@ -112,6 +113,12 @@ class SettingsFragment : Fragment() {
             val langNum = lang_radioGroup.checkedRadioButtonId
             lang_radioBtn = view.findViewById(langNum)
             updateLang(lang_radioBtn.text.toString())
+
+//            val tempUnit = tempUnit_radipGroup.checkedRadioButtonId
+//            tempUnit_radioBtn = view.findViewById(tempUnit)
+//            updateWeatherUnit(view,)
+
+
         }
 
     }
@@ -123,14 +130,55 @@ class SettingsFragment : Fragment() {
         sharedPreferences?.edit()?.apply() {
             if (lang == "Arabic") {
                 putString(Constant.LANG, "ar")
+                setAppLanguage("ar")
             } else {
                 putString(Constant.LANG, "en")
+                setAppLanguage("en")
             }
         }?.apply()
 
         var lang_shared = sharedPreferences?.getString(Constant.LANG,null)
         Log.i("call", "initUI: $lang_shared")
     }
-    private fun updateWeatherUnit(unit:String){}
-    private fun updateAlertSetting(isEnable:Boolean){}
+    private fun updateWeatherUnit(view:View,unit:String){
+
+
+//        tempUnit_radipGroup.setOnCheckedChangeListener{
+//                tempUnit_radipGroup , i -> var radioButton : RadioButton = view.findViewById(i)
+//                when(radioButton.id){
+//                    R.id.calvinRadioButton -> {
+//                        SharedPrefrencesHandler.saveSettingsInSharedPref(Constants.UNITS_KEY,Constants.myUnitStandard,this)
+//                        testTv.text = radioButton.text.toString()
+//                    }
+//                    R.id.celsiusRadioButton -> {
+//                        SharedPrefrencesHandler.saveSettingsInSharedPref(Constants.UNITS_KEY,Constants.myUnitMetric,this)
+//                        testTv.text = radioButton.text.toString()
+//                    }
+//                    R.id.fahrenheitRadioButton -> {
+//                        SharedPrefrencesHandler.saveSettingsInSharedPref(Constants.UNITS_KEY,Constants.myUnitImperial,this)
+//                        testTv.text = radioButton.text.toString()
+//                    }
+//                }
+//
+//        }
+
+
+    }
+    private fun updateAlertSetting(isEnable:Boolean){
+
+    }
+    fun setAppLanguage(language : String) {
+        val config = this.resources.configuration
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        config.setLocale(locale)
+        activity?.createConfigurationContext(config)
+        this.resources.updateConfiguration(config, this.resources.displayMetrics)
+
+        var refresh = Intent(activity?.applicationContext,HomeActivity::class.java)
+        refresh.putExtra("fromSetting",true)
+        startActivity(refresh)
+
+    }
+
 }
