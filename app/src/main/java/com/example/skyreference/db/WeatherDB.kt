@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.skyreference.model.Weather
+import androidx.room.TypeConverters
+import com.example.skyreference.model.WeatherData
 
-@Database(entities = [Weather::class], version = 1)
+@TypeConverters(Convert::class)
+@Database(entities = [WeatherData::class], version = 1)
 abstract class WeatherDB : RoomDatabase() {
 
     abstract fun getWeatherDAO(): WeatherDAO

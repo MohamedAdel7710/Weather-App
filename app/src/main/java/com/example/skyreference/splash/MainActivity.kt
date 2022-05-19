@@ -7,32 +7,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.skyreference.map.view.MapsActivity
 import com.example.skyreference.R
-import com.example.skyreference.SearchActivity
+import com.example.skyreference.favourites.view.FavActivity
 import com.example.skyreference.home.view.HomeActivity
+import com.example.skyreference.model.Constant
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    companion object{
-        const val SHARED_DATA = "sharedData"
-        const val LANG = "Lang"
-        const val UNIT = "unit"
-        const val ID = "id"
-    }
+
     private val REQ_LOCATION_CODE: Int = 7
     private val GPS_REQ_CODE = 100
     lateinit var locationRequest: LocationRequest
@@ -40,19 +34,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setDefaultSetting()
         splashScreen()
-        setDefualtSetting()
+
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
-    private fun setDefualtSetting()
+    private fun setDefaultSetting()
     {
-        val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA, Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply {
-            putString(LANG,"en")
-            putString(UNIT,"metric")
-            putString(ID,"566c25ae9df35962cf23b1a974ae435c")
+            putString(Constant.LANG,"en")
+            putString(Constant.UNIT,"metric")
+            putString(Constant.ID,"566c25ae9df35962cf23b1a974ae435c")
+            putBoolean(Constant.ALERT,false)
+//            putString(Constant.USER_LOCATION_LAT,"0.0")
+//            putString(Constant.USER_LOCATION_LONG,"0.0")
         }.apply()
     }
     private fun splashScreen(){
@@ -96,7 +94,6 @@ class MainActivity : AppCompatActivity() {
                     ApiException::class.java
                 )
                 getLocation()
-//                startActivity(Intent(this,HomeActivity::class.java))
             }
             catch (e : ApiException)
             {
@@ -124,21 +121,49 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun getLocation()
     {
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
-            val location = task.getResult()
-            if(location != null)
-            {
-                Log.i("call", "Latitude: ${location.latitude} ; longitude: ${location.longitude}")
-                Toast.makeText(applicationContext,"Latitude: ${location.latitude} ; longitude: ${location.longitude}",Toast.LENGTH_SHORT).show()
-                val sharedPreferences = getSharedPreferences(SHARED_DATA, Context.MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                editor.apply {
-                    putString(HomeActivity.USER_LOCATION_LAT,location.latitude.toString())
-                    putString(HomeActivity.USER_LOCATION_LONG,location.longitude.toString())
-                }.apply()
-                startActivity(Intent(this,HomeActivity::class.java))
-            }
-        }
+        val locationRequest = LocationRequest
+            .create()
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(10 * 1000)
+            .setFastestInterval(2000)
+
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    super.onLocationResult(locationResult)
+                    Log.i("call", "Latitude: ${locationResult.lastLocation.latitude} ; longitude: ${locationResult.lastLocation.longitude}")
+                    Toast.makeText(applicationContext,"Latitude: ${locationResult.lastLocation.latitude} ; longitude: ${locationResult.lastLocation.longitude}",Toast.LENGTH_SHORT).show()
+                    val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA, Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.apply {
+                        putString(HomeActivity.USER_LOCATION_LAT,locationResult.lastLocation.latitude.toString())
+                        putString(HomeActivity.USER_LOCATION_LONG,locationResult.lastLocation.longitude.toString())
+                    }.apply()
+                    val intent = Intent(this@MainActivity,HomeActivity::class.java)
+                    intent.putExtra("toFav",false)
+                    startActivity(intent)
+                    fusedLocationProviderClient.removeLocationUpdates(this)
+                }
+            }, Looper.getMainLooper()
+        )
+
+
+//        fusedLocationProviderClient.re.addOnSuccessListener(this
+//        ) {
+//            if(it != null)
+//            {
+//                Log.i("call", "Latitude: ${it.latitude} ; longitude: ${it.longitude}")
+//                Toast.makeText(applicationContext,"Latitude: ${it.latitude} ; longitude: ${it.longitude}",Toast.LENGTH_SHORT).show()
+//                val sharedPreferences = getSharedPreferences(SHARED_DATA, Context.MODE_PRIVATE)
+//                val editor = sharedPreferences.edit()
+//                editor.apply {
+//                    putString(HomeActivity.USER_LOCATION_LAT,it.latitude.toString())
+//                    putString(HomeActivity.USER_LOCATION_LONG,it.longitude.toString())
+//                }.apply()
+//                startActivity(Intent(this,HomeActivity::class.java))
+//            }
+//        }
 
 //        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 //        val locationListener = object : LocationListener {
@@ -173,7 +198,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getStoredUserLocation():Boolean{
-        val sharedPreferences = getSharedPreferences(SHARED_DATA,Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(Constant.SHARED_DATA,Context.MODE_PRIVATE)
         val lat = sharedPreferences.getString(HomeActivity.USER_LOCATION_LAT,null)
         val long = sharedPreferences.getString(HomeActivity.USER_LOCATION_LONG,null)
         if(lat !=null && long != null)
@@ -198,8 +223,9 @@ class MainActivity : AppCompatActivity() {
                         checkGPS()
                     }
                 } else {
-                    startActivity(Intent(this, SearchActivity::class.java))
-                    finish()
+                    val intent = Intent(this,HomeActivity::class.java)
+                    intent.putExtra("toFav",true)
+                    startActivity(intent)
                 }
             }
         }
@@ -212,22 +238,34 @@ class MainActivity : AppCompatActivity() {
             when(resultCode){
                 Activity.RESULT_OK->{
                     getLocation()
-                    startActivity(Intent(this,HomeActivity::class.java))
+//                    startActivity(Intent(this,HomeActivity::class.java))
                 }
                 Activity.RESULT_CANCELED->
                 {
                     if(!getStoredUserLocation())
                     {
-                        startActivity(Intent(this,SearchActivity::class.java))
+                        val intent = Intent(this, HomeActivity::class.java)
+                        intent.putExtra("toFav",true)
+                        startActivity(intent)
                         finish()
                     }
-                    val sharedPreferences = getSharedPreferences(MainActivity.SHARED_DATA,Context.MODE_PRIVATE)
-                    val lat = sharedPreferences.getString(HomeActivity.USER_LOCATION_LAT,null)
-                    val long = sharedPreferences.getString(HomeActivity.USER_LOCATION_LONG,null)
-                    val lang = sharedPreferences.getString(MainActivity.LANG,null)
-                    val unit = sharedPreferences.getString(MainActivity.UNIT,null)
-                    Log.i("call", "Latitude: $lat ; longitude: $long; lang: $lang ; unit:$unit")
-                    Toast.makeText(applicationContext,"Latitude: $lat ; longitude: $long", Toast.LENGTH_SHORT).show()
+                    else {
+                        val sharedPreferences =
+                            getSharedPreferences(Constant.SHARED_DATA, Context.MODE_PRIVATE)
+                        val lat = sharedPreferences.getString(Constant.USER_LOCATION_LAT, null)
+                        val long = sharedPreferences.getString(Constant.USER_LOCATION_LONG, null)
+                        val lang = sharedPreferences.getString(Constant.LANG, null)
+                        val unit = sharedPreferences.getString(Constant.UNIT, null)
+                        val intent = Intent(this, HomeActivity::class.java)
+                        intent.putExtra("toFav", false)
+                        startActivity(intent)
+                        Log.i("call", "Latitude: $lat ; longitude: $long; lang: $lang ; unit:$unit")
+//                        Toast.makeText(
+//                            applicationContext,
+//                            "Latitude: $lat ; longitude: $long",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+                    }
                 }
             }
         }

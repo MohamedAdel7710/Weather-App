@@ -1,17 +1,21 @@
 package com.example.skyreference.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.example.skyreference.db.Convert
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "FavouriteLocations")
-data class WeatherData(@NotNull @SerializedName("lat") var lat : Double,
-                       @NotNull@SerializedName("lon")var long : Double,
+data class WeatherData(@PrimaryKey@SerializedName("lat") var lat : Double,
+                       @SerializedName("lon")var lon : Double,
                        @SerializedName("timezone")var timeZone : String,
-                       @SerializedName("current")var currentWeather: CurrentWeather,
-                       @SerializedName("hourly")var hourlyWeather:List<Hourly>,
-                       @SerializedName("daily")var dailyWeather:List<Daily>)
+                       @TypeConverters(Convert::class)@SerializedName("current")var currentWeather: CurrentWeather,
+                       @TypeConverters(Convert::class)@SerializedName("hourly")var hourlyWeather:List<Hourly>,
+                       @TypeConverters(Convert::class)@SerializedName("daily")var dailyWeather:List<Daily>)
 //Current Model..........................................................................
 data class CurrentWeather(@SerializedName("dt")var time:Int,//
                           @SerializedName("sunrise")var sunRiseTime:Int,
